@@ -1,0 +1,41 @@
+{
+	"schemaVersion": 1,
+	"id": "heartbeat",
+	"version": "${version}",
+	"name": "Heartbeat",
+	"description": "Library that adds auto update capabilities to other mods!",
+	"authors": [
+		"1TheCrazy"
+	],
+	"contact": {
+		"homepage": "https://heartbeatmc.net/",
+		"sources": "https://github.com/1TheCrazy/HeartbeatMC"
+	},
+	"license": "MIT",
+	"icon": "assets/heartbeat/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"net.heartbeat.Heartbeat"
+		],
+		"client": [
+			"net.heartbeat.HeartbeatClient"
+		]
+	},
+	"mixins": [
+		"heartbeat.mixins.json",
+		{
+			"config": "heartbeat.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.17.2",
+		"minecraft": "~1.21.7",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
