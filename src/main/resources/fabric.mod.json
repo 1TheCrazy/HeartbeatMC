@@ -3,7 +3,7 @@
 	"id": "heartbeat",
 	"version": "${version}",
 	"name": "Heartbeat",
-	"description": "Library that adds auto update capabilities to other mods!",
+	"description": "Adds Auto Updates for Mods hosted on Modrinth!",
 	"authors": [
 		"1TheCrazy"
 	],
@@ -13,7 +13,15 @@
 	},
 	"license": "MIT",
 	"icon": "assets/heartbeat/icon.png",
-	"environment": "*",
+	"environment": "client",
+	"custom": {
+		"modmenu": {
+			"links" : {
+				"modmenu.kofi" : "https://ko-fi.com/1thecrazy"
+			},
+			"update_checker": true
+		}
+	},
 	"entrypoints": {
 		"main": [
 			"net.heartbeat.Heartbeat"
@@ -34,8 +42,5 @@
 		"minecraft": "~1.21.7",
 		"java": ">=21",
 		"fabric-api": "*"
-	},
-	"suggests": {
-		"another-mod": "*"
 	}
 }
