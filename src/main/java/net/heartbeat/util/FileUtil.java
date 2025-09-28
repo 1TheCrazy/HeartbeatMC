@@ -12,11 +12,19 @@ public class FileUtil {
         return FabricLoader.getInstance().getGameDir().resolve("." + Heartbeat.MOD_ID);
     }
 
+    public static Path getUpdatePath(){
+        return getDefaultPath().resolve("updates");
+    }
+
     public static void initialize() {
         try{
             // Create default dir (if not exists)
             if(!Files.exists(getDefaultPath()))
                 Files.createDirectory(getDefaultPath());
+
+            // Create update dir (if not exists)
+            if(!Files.exists(getUpdatePath()))
+                Files.createDirectory(getUpdatePath());
 
             // Extract replacer JAR to defaultPath
             EmbeddedExtractor.extractReplacerJar(getDefaultPath());

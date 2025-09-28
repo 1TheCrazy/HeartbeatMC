@@ -135,6 +135,10 @@ configurations {
 	}
 }
 
+tasks.named("compileReplacerJava", JavaCompile).configure {
+	options.release = 19
+}
+
 dependencies {
 	// Expose lib class to fabric project
 	implementation sourceSets.replacer.output
