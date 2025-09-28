@@ -16,7 +16,7 @@ public class ShutdownHooker {
     public static void install() {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
-                long pid = ProcessHandle.current().pid();
+                String pid = String.valueOf(ProcessHandle.current().pid());
 
                 // Get the Path to the current java.exe
                 String javaHome = System.getProperty("java.home");
@@ -33,9 +33,10 @@ public class ShutdownHooker {
                         "powershell", "-ExecutionPolicy", "Bypass", "-NoExit", "-Command",
                         // Launch replacer JAR with the java bin we were just using
                         javaBin.toString(), "-jar", ".\\.heartbeat\\" + EmbeddedExtractor.REPLACER_JAR_FILE_NAME,
-                        // 1st Arg: Running dir of Game
-                        // 2nd Arg: String of jars that should be deleted ("mod1.jar,mod2.jar")
-                        FabricLoader.getInstance().getGameDir().toString(), "mod1.jar,mod2.jar"
+                        // 1st Arg: JVM process ID
+                        // 2nd Arg: Running dir of Game
+                        // 3rd Arg: String of jars that should be deleted ("mod1.jar,mod2.jar")
+                        pid, FabricLoader.getInstance().getGameDir().toString(), "mod1.jar,mod2.jar"
                 ).start();
 
             } catch (Exception e) {

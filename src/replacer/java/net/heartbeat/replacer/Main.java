@@ -2,6 +2,11 @@ package net.heartbeat.replacer;
 
 import java.io.IOException;
 import java.nio.file.*;
+import java.time.Duration;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class Main {
     public static final int REPLACER_VERSION = 1;
@@ -9,11 +14,18 @@ public class Main {
     // 1st Arg: Running dir of Game
     // 2nd Arg: String of jars that should be deleted ("mod1.jar,mod2.jar")
     public static void main(String[] args) {
-        Path gameDir = Path.of(args[0]);
+        long pid = Long.parseLong(args[0]);
+
+        // 10min until we time out
+        // During testing we didn't even need to wait for JVM pid to not exist anymore, but on PC's this could be needed.
+        if(!waitForPidExit(pid, Duration.ofMinutes(10)))
+            return;
+
+        Path gameDir = Path.of(args[1]);
         Path dotHeartbeatDir = gameDir.resolve(".heartbeat");
         Path updatesDir = dotHeartbeatDir.resolve("updates");
         Path modsDir = gameDir.resolve("mods");
-        String[] toBeDeletedJarNames = args[1].split(",");
+        String[] toBeDeletedJarNames = args[2].split(",");
 
         // Copy every new version jar from updatesDir to modsDir
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(updatesDir)) {
@@ -38,6 +50,26 @@ public class Main {
                 System.out.println("Deleted old JAR '" + jarName + "'");
             else
                 System.out.println("Couldn't delete old JAR '" + jarName + "'");
+        }
+    }
+
+    public static boolean waitForPidExit(long pid, Duration timeout){
+        Optional<ProcessHandle> opt = ProcessHandle.of(pid);
+
+        // If the PID doesn't exist or is already dead, we're done.
+        if (opt.isEmpty() || !opt.get().isAlive()) return true;
+
+        ProcessHandle ph = opt.get();
+
+        try {
+            if (timeout == null || timeout.isZero() || timeout.isNegative())
+                ph.onExit().join();
+            else
+                ph.onExit().get(timeout.toMillis(), TimeUnit.MILLISECONDS);
+
+            return true;
+        } catch (TimeoutException | ExecutionException | InterruptedException e) {
+            return false;
         }
     }
 }
