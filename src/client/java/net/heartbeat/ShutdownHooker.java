@@ -36,7 +36,7 @@ public class ShutdownHooker {
                         // 1st Arg: JVM process ID
                         // 2nd Arg: Running dir of Game
                         // 3rd Arg: String of jars that should be deleted ("mod1.jar,mod2.jar")
-                        pid, FabricLoader.getInstance().getGameDir().toString(), "mod1.jar,mod2.jar"
+                        pid, FabricLoader.getInstance().getGameDir().toString(), HeartbeatClient.getRemovableJarsString()
                 ).start();
 
             } catch (Exception e) {
