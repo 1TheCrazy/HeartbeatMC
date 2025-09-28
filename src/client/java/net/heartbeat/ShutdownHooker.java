@@ -11,7 +11,7 @@ public class ShutdownHooker {
     // Windows holds a lock on files that are used, so when the JVM loads the mod JARs it locks them, so that they cannot be deleted
     // Therefore we have to wait until the lock is released (which happens when the JVM terminates)
     // But then we can't execute code anymore, so we spawn a detached Process that handles the deletion of files.
-    // There is a Path.toFile().deleteOnExit(), but ChatGPT (the almighty) told that the Lock may still not be released when this executes
+    // There is a Path.toFile().deleteOnExit(), but ChatGPT (the almighty) told that the Lock may still not be released when this executes,
     // so we can't use that (and I had the shutdown hook already set up when I learnt about the method ¯\_(ツ)_/¯)
     public static void install() {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
