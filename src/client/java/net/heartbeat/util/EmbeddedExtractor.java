@@ -41,7 +41,8 @@ public class EmbeddedExtractor {
         try{
             Files.walk(dir).skip(1).sorted(reverseOrder()).forEach(p -> {
                 try {
-                    Files.deleteIfExists(p);
+                    if(p.getFileName().endsWith(".jar"))
+                        Files.deleteIfExists(p);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

@@ -127,6 +127,8 @@ public class UpdateChecker {
     }
 
     private static void kickoffDownload(String downloadUri, String fileName, ModInfo info){
+        Heartbeat.LOGGER.info("Downloading update for'{}' from '{}'({})", info.modName, downloadUri, fileName);
+
         HttpClient client = HttpClient.newHttpClient();
 
         Path downloadPath = FileUtil.getUpdatePath().resolve(fileName);
