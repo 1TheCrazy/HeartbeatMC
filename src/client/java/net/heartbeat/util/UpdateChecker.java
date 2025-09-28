@@ -148,15 +148,11 @@ public class UpdateChecker {
                 // This is the reason for the ModInfo class
                 // We don't get the name of the mod from request as that only includes version info,
                 // so we just store the name as well (too bad we don't get tuples)
-                MinecraftClient.getInstance().execute(() -> {
-                    ToastUtil.showUpdatedToast(info.modName);
-                });
+                MinecraftClient.getInstance().execute(() -> ToastUtil.showUpdatedToast(info.modName));
             }
             else{
                 // Display Error Toast
-                MinecraftClient.getInstance().execute(() -> {
-                    ToastUtil.showUpdatedToast(info.modName);
-                });
+                MinecraftClient.getInstance().execute(() -> ToastUtil.showErrorToast(info.modName));
             }
         });
     }

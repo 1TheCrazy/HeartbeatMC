@@ -30,8 +30,6 @@ public class HeartbeatClient implements ClientModInitializer {
 
 	private void scheduleUpdateCheck(){
 		// Only Check for updates when resources are loaded since translation keys may not yet be loaded in Main Menu if we show a Toast too early
-		ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
-			UpdateChecker.check();
-		});
+		ClientLifecycleEvents.CLIENT_STARTED.register(client -> UpdateChecker.check());
 	}
 }

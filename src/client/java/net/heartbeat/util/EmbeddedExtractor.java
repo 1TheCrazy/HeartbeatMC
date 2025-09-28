@@ -16,7 +16,7 @@ public class EmbeddedExtractor {
     private static final String META_INF_PATH = "META-INF/jars/" + EMBEDDED_EXACT;
     public static final String REPLACER_JAR_FILE_NAME = "heartbeat-replacer-embedded" + "-v" + Main.REPLACER_VERSION + ".jar";
 
-    private EmbeddedExtractor() {};
+    private EmbeddedExtractor() {}
 
     // Extracts the replacer JAR resource and places it into the target Path
     public static void extractReplacerJar(Path target){

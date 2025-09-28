@@ -1,6 +1,5 @@
 package net.heartbeat.util;
 
-import net.heartbeat.Heartbeat;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.text.Text;
@@ -31,7 +30,7 @@ public class ToastUtil {
                         client,
                         SystemToast.Type.FILE_DROP_FAILURE,
                         Text.translatable("gui.heartbeat.title.failure"),
-                        Text.translatable("gui.heartbeat.description.faile", name)
+                        Text.translatable("gui.heartbeat.description.failure", name)
                 )
         );
     }
