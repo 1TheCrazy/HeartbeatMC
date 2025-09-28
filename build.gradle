@@ -38,7 +38,6 @@ dependencies {
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	
 }
 
 processResources {
@@ -87,4 +86,59 @@ publishing {
 		// The repositories here will be used for publishing your artifact, not for
 		// retrieving dependencies.
 	}
+}
+
+
+remapJar{
+	archiveFileName.set("${project.archives_base_name}-v${project.mod_version}+mc${project.minecraft_version}.jar")
+}
+
+// replacer Source Set
+sourceSets {
+	replacer {
+		java.srcDir "src/replacer/java"
+		resources.srcDir "src/replacer/resources"
+	}
+}
+
+// Build replacer JAR
+tasks.register("replacerJar", Jar) {
+	manifest {
+		attributes(
+				"Main-Class": "net.heartbeat.replacer.Main"
+		)
+	}
+
+	group = "build"
+	description = "Assemble the replacer JAR from src/replacer"
+	from sourceSets.replacer.output
+	// predictable name: heartbeat-replacer-embedded.jar
+	archiveBaseName.set("${project.archives_base_name}-replacer-embedded")
+	archiveVersion.set("")
+}
+
+// Expose replacerJar as a CONSUMABLE VARIANT so Loom sees a proper 'module'
+def objs = objects
+configurations {
+	embeddedReplacer {
+		canBeResolved = false
+		canBeConsumed = true
+		attributes {
+			attribute(Category.CATEGORY_ATTRIBUTE, objs.named(Category, Category.LIBRARY))
+			attribute(Bundling.BUNDLING_ATTRIBUTE, objs.named(Bundling, Bundling.EXTERNAL))
+			attribute(Usage.USAGE_ATTRIBUTE, objs.named(Usage, Usage.JAVA_RUNTIME))
+			attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objs.named(LibraryElements, LibraryElements.JAR))
+		}
+
+		// publish the replacerJar as the outgoing artifact
+		outgoing.artifact(tasks.named("replacerJar"))
+	}
+}
+
+dependencies {
+	// Expose lib class to fabric project
+	implementation sourceSets.replacer.output
+
+	// Nest it inside the heartbeat JAR
+	include(project(path: ":", configuration: "embeddedReplacer"))
 }
