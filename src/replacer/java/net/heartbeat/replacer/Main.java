@@ -26,17 +26,22 @@ public class Main {
         Path dotHeartbeatDir = gameDir.resolve(".heartbeat");
         Path updatesDir = dotHeartbeatDir.resolve("updates");
         Path modsDir = gameDir.resolve("mods");
-        // We may run into errors trying to access this if "" is passed, but then we don't have anything to delete/move and a crash is acceptable  (I lowkey don't want to handle this)
-        String[] toBeDeletedJarNames = args[2].split(",");
+
+        // If "" is passed as an arg it does not count as a string, so we have to account for that
+        String[] toBeDeletedJarNames;
+        if(args.length == 3)
+            toBeDeletedJarNames = args[2].split(",");
+        else
+            toBeDeletedJarNames = new String[0];
 
         // Copy every new version jar from updatesDir to modsDir
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(updatesDir)) {
             for (Path file : stream) {
                 // Partial Download, just delete
-                if(file.endsWith(".part")) {
+                if(file.getFileName().toString().endsWith(".part")) {
                     // Ignore Result
                     boolean _delete = file.toFile().delete();
-                } else if (Files.isRegularFile(file) && file.endsWith(".jar")) {
+                } else if (file.getFileName().toString().endsWith(".jar")) {
                     Path dest = modsDir.resolve(file.getFileName());
                     Files.move(file, dest, StandardCopyOption.REPLACE_EXISTING);
 
