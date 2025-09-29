@@ -27,6 +27,10 @@ public class EmbeddedExtractor {
 
             Path dst = target.resolve(REPLACER_JAR_FILE_NAME);
 
+            // Current version of replacer is already present
+            if(dst.toFile().exists())
+                return;
+
             // Clear dir so only newest version is retained
             clearDir(target);
 
