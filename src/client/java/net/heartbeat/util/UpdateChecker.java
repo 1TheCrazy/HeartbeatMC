@@ -11,12 +11,15 @@ import net.heartbeat.Heartbeat;
 import net.heartbeat.HeartbeatClient;
 import net.minecraft.client.MinecraftClient;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,11 +39,14 @@ public class UpdateChecker {
     public static void check(){
         Heartbeat.LOGGER.info("Checking for updates...");
 
-        // Get a Map of every Mod's Hash that is loaded mapped to its relevant Info
-        Map<String, ModInfo> hash2JarMap = getHash2JarMap();
+        // Do Networking shit on another thread
+        new Thread(() -> {
+            // Get a Map of every Mod's Hash that is loaded mapped to its relevant Info
+            Map<String, ModInfo> hash2JarMap = getHash2JarMap();
 
-        // Query Modrinth for updates
-        queryModrinth(hash2JarMap);
+            // Query Modrinth for updates
+            queryModrinth(hash2JarMap);
+        }).start();
     }
 
     private static Map<String, ModInfo> getHash2JarMap(){
@@ -131,7 +137,18 @@ public class UpdateChecker {
 
         HttpClient client = HttpClient.newHttpClient();
 
-        Path downloadPath = FileUtil.getUpdatePath().resolve(fileName);
+        Path targetPath;
+        Path tmpPath;
+
+        try{
+            targetPath = FileUtil.getUpdatePath().resolve(fileName);
+            tmpPath = Files.createTempFile(FileUtil.getUpdatePath(), fileName, ".part");
+        }
+        catch(Exception ex){
+            Heartbeat.LOGGER.error("Failed reserving temp file for'{}' from '{}'({})", info.modName, downloadUri, fileName);
+            return;
+        }
+
 
         HttpRequest req = HttpRequest.newBuilder()
                 .uri(URI.create(downloadUri))
@@ -139,11 +156,18 @@ public class UpdateChecker {
 
         // async download
         CompletableFuture<HttpResponse<Path>> future =
-                client.sendAsync(req, HttpResponse.BodyHandlers.ofFile(downloadPath));
+                client.sendAsync(req, HttpResponse.BodyHandlers.ofFile(tmpPath));
 
         future.thenAccept(resp -> {
             if (resp.statusCode() == 200) {
-                // Mark that this mod's jar should be removed on restart
+                // Rename .part
+                try {
+                    Files.move(tmpPath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException ex) {
+                    Heartbeat.LOGGER.error("Failed renaming .part ({}): {}", fileName, ex);
+                }
+
+                // Mark that this mod's old jar should be removed on restart
                 HeartbeatClient.markJarAsRemovable(info.jarName);
 
                 // Display Toast

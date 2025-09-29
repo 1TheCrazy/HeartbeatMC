@@ -17,7 +17,7 @@ public class Main {
         long pid = Long.parseLong(args[0]);
 
         // 10min until we time out
-        // During testing we didn't even need to wait for JVM pid to not exist anymore, but on PC's this could be needed.
+        // During testing we didn't even need to wait for JVM pid to not exist anymore, but on slow PC's this could be needed.
         if(!waitForPidExit(pid, Duration.ofMinutes(10)))
             return;
 
@@ -30,7 +30,11 @@ public class Main {
         // Copy every new version jar from updatesDir to modsDir
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(updatesDir)) {
             for (Path file : stream) {
-                if (Files.isRegularFile(file)) {
+                // Partial Download, just delete
+                if(file.endsWith(".part")) {
+                    // Ignore Result
+                    boolean _delete = file.toFile().delete();
+                } else if (Files.isRegularFile(file) && file.endsWith(".jar")) {
                     Path dest = modsDir.resolve(file.getFileName());
                     Files.move(file, dest, StandardCopyOption.REPLACE_EXISTING);
 
