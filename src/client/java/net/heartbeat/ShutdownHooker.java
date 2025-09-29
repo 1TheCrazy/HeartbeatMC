@@ -1,5 +1,6 @@
 package net.heartbeat;
 
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.heartbeat.util.EmbeddedExtractor;
 
@@ -14,7 +15,7 @@ public class ShutdownHooker {
     // There is a Path.toFile().deleteOnExit(), but ChatGPT (the almighty) told that the Lock may still not be released when this executes,
     // so we can't use that (and I had the shutdown hook already set up when I learnt about the method ¯\_(ツ)_/¯)
     public static void install() {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+        ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
             try {
                 String pid = String.valueOf(ProcessHandle.current().pid());
 
@@ -41,8 +42,8 @@ public class ShutdownHooker {
 
             } catch (Exception e) {
                 // This may not show up in logs
-                Heartbeat.LOGGER.error("Failed to start Replacer: {0}", e);
+                Heartbeat.LOGGER.error("Failed to start Replacer: ", e);
             }
-        }, "jar-replacer"));
+        });
     }
 }

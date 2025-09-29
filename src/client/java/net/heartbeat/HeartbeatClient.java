@@ -6,7 +6,7 @@ import net.heartbeat.util.FileUtil;
 import net.heartbeat.util.UpdateChecker;
 
 public class HeartbeatClient implements ClientModInitializer {
-	private static String removableJarsString;
+	private static String removableJarsString = "";
 
 	@Override
 	public void onInitializeClient() {

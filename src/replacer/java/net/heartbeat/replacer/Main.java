@@ -11,8 +11,9 @@ import java.util.concurrent.TimeoutException;
 public class Main {
     public static final int REPLACER_VERSION = 1;
 
-    // 1st Arg: Running dir of Game
-    // 2nd Arg: String of jars that should be deleted ("mod1.jar,mod2.jar")
+    // 1st Arg: pid of jvm
+    // 2nd Arg: Running dir of Game
+    // 3rd Arg: String of jars that should be deleted ("mod1.jar,mod2.jar")
     public static void main(String[] args) {
         long pid = Long.parseLong(args[0]);
 
@@ -25,6 +26,7 @@ public class Main {
         Path dotHeartbeatDir = gameDir.resolve(".heartbeat");
         Path updatesDir = dotHeartbeatDir.resolve("updates");
         Path modsDir = gameDir.resolve("mods");
+        // We may run into errors trying to access this if "" is passed, but then we don't have anything to delete/move and a crash is acceptable  (I lowkey don't want to handle this)
         String[] toBeDeletedJarNames = args[2].split(",");
 
         // Copy every new version jar from updatesDir to modsDir
